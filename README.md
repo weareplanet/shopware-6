@@ -8,7 +8,7 @@ For the 6.4 plugin please visit https://github.com/weareplanet/shopware-6-4
 
 ## Requirements
 
-- PHP 7.4 - 8.1
+- PHP 7.4 - 8.2
 - Shopware 6.5.x
 
 ## Installation
@@ -62,7 +62,7 @@ tail -f var/log/weareplanet_payment*.log
 
 ## Documentation
 
-[Documentation](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/5.0.2/docs/en/documentation.html)
+[Documentation](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/5.0.3/docs/en/documentation.html)
 
 ## License
 
