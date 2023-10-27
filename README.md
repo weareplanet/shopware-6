@@ -64,6 +64,10 @@ tail -f var/log/weareplanet_payment*.log
 
 [Documentation](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/5.0.3/docs/en/documentation.html)
 
+## Support
+
+For support queries please contact [WeArePlanet support](mailto:support@datatrans.ch?subject=Support%20on%20Shopware%206%20-%20Topic%3A).
+
 ## License
 
 Please see the [license file](https://github.com/weareplanet/shopware-6/blob/master/LICENSE.txt) for more information.
