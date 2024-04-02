@@ -4,6 +4,7 @@ namespace WeArePlanetPayment\Core\Settings\Command;
 
 use Symfony\Component\{
 	Console\Command\Command,
+    Console\Attribute\AsCommand,
 	Console\Input\InputInterface,
 	Console\Input\InputOption,
 	Console\Output\OutputInterface};
@@ -16,12 +17,8 @@ use WeArePlanetPayment\Core\{
  * @internal
  * @package WeArePlanetPayment\Core\Settings\Command
  */
+#[AsCommand(name: 'weareplanet:settings:install')]
 class SettingsCommand extends Command {
-
-	/**
-	 * @var string
-	 */
-	protected static $defaultName = 'weareplanet:settings:install';
 
 	/**
 	 * @var \WeArePlanetPayment\Core\Settings\Service\SettingsService
@@ -34,7 +31,7 @@ class SettingsCommand extends Command {
 	 */
 	public function __construct(SettingsService $settingsService)
 	{
-		parent::__construct(self::$defaultName);
+		parent::__construct();
 		$this->settingsService = $settingsService;
 	}
 
