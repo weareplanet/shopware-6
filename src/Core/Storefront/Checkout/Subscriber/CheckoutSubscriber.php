@@ -149,13 +149,6 @@ class CheckoutSubscriber implements EventSubscriberInterface
             if (!$isOrderTransactionStateOpen) { // order payment status is open or in progress
                 return;
             }
-
-            $isWeArePlanetEmail = isset($templateData[OrderMailService::EMAIL_ORIGIN_IS_WEAREPLANET]);
-
-            if (!$isWeArePlanetEmail) {
-                $this->logger->info('Email disabled for ', ['orderId' => $order->getId()]);
-                $event->stopPropagation();
-            }
         }
     }
 
