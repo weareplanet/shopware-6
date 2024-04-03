@@ -18,17 +18,17 @@
     "extra": {
         "copyright": "(c) by WeArePlanet",
         "description": {
-            "de-DE": "WeArePlanet integration f\u00fcr Shopware 6",
-            "en-GB": "WeArePlanet integration for Shopware 6",
-            "fr-FR": "Int\u00e9gration de WeArePlanet pour Shopware 6",
-            "it-IT": "Integrazione WeArePlanet per Shopware"
-        },
-        "label": {
-            "de-DE": "WeArePlanet Produkte f\u00fcr Shopware 6",
-            "en-GB": "WeArePlanet Products for Shopware 6",
-            "fr-FR": "WeArePlanet Produits for Shopware 6",
-            "it-IT": "WeArePlanet Prodotti per Shopware 6"
-        },
+			"de-DE": "WeArePlanet integration für Shopware 6",
+			"en-GB": "WeArePlanet integration for Shopware 6",
+			"fr-FR": "Intégration de WeArePlanet pour Shopware 6",
+			"it-IT": "Integrazione WeArePlanet per Shopware"
+		},
+		"label": {
+			"de-DE": "WeArePlanet Produkte für Shopware 6",
+			"en-GB": "WeArePlanet Products for Shopware 6",
+			"fr-FR": "WeArePlanet Produits for Shopware 6",
+			"it-IT": "WeArePlanet Prodotti per Shopware 6"
+		},
         "manufacturerLink": {
             "de-DE": "https://www.weareplanet.com/",
             "en-GB": "https://www.weareplanet.com/",
@@ -62,5 +62,5 @@
         "weareplanet/sdk": "4.0.2"
     },
     "type": "shopware-platform-plugin",
-    "version": "5.0.7"
+    "version": "5.0.8"
 }
