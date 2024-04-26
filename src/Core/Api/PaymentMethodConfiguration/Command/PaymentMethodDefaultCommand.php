@@ -6,7 +6,6 @@ namespace WeArePlanetPayment\Core\Api\PaymentMethodConfiguration\Command;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\{
 	Console\Command\Command,
-    Console\Attribute\AsCommand,
 	Console\Input\InputInterface,
 	Console\Output\OutputInterface};
 use WeArePlanetPayment\Core\Util\PaymentMethodUtil;
@@ -16,8 +15,12 @@ use WeArePlanetPayment\Core\Util\PaymentMethodUtil;
  *
  * @package WeArePlanetPayment\Core\Api\PaymentMethodConfiguration\Command
  */
-#[AsCommand(name: 'weareplanet:payment-method:default')]
 class PaymentMethodDefaultCommand extends Command {
+
+	/**
+	 * @var string
+	 */
+	protected static $defaultName = 'weareplanet:payment-method:default';
 
 	/**
 	 * @var \WeArePlanetPayment\Core\Util\PaymentMethodUtil
@@ -31,7 +34,7 @@ class PaymentMethodDefaultCommand extends Command {
 	 */
 	public function __construct(PaymentMethodUtil $paymentMethodUtil)
 	{
-		parent::__construct();
+		parent::__construct(self::$defaultName);
 		$this->paymentMethodUtil = $paymentMethodUtil;
 	}
 
