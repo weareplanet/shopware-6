@@ -5,7 +5,7 @@ namespace WeArePlanetPayment\Core\Api\Configuration\Controller;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\{
 	Framework\Context,
-	Framework\Routing\Annotation\RouteScope,};
+    Framework\Log\Package,};
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\{
 	HttpFoundation\JsonResponse,
@@ -26,8 +26,9 @@ use WeArePlanetPayment\Core\{
  * This class handles web calls that are made via the WeArePlanetPayment settings page.
  *
  * @package WeArePlanetPayment\Core\Api\Config\Controller
- * @Route(defaults={"_routeScope"={"api"}})
  */
+#[Package('system-settings')]
+#[Route(defaults: ['_routeScope' => ['api']])]
 class ConfigurationController extends AbstractController {
 
 	/**
@@ -100,12 +101,10 @@ class ConfigurationController extends AbstractController {
 	 * @param \Shopware\Core\Framework\Context          $context
 	 * @return \Symfony\Component\HttpFoundation\JsonResponse
 	 *
-	 * @Route(
-	 *     "/api/_action/weareplanet/configuration/set-weareplanet-as-sales-channel-payment-default",
-	 *     name="api.action.weareplanet.configuration.set-weareplanet-as-sales-channel-payment-default",
-	 *     methods={"POST"}
-	 *     )
 	 */
+    #[Route("/api/_action/weareplanet/configuration/set-weareplanet-as-sales-channel-payment-default",
+    	name: "api.action.weareplanet.configuration.set-weareplanet-as-sales-channel-payment-default",
+        methods: ['POST'])]
 	public function setWeArePlanetAsSalesChannelPaymentDefault(Request $request, Context $context): JsonResponse
 	{
 		$salesChannelId = $request->request->get('salesChannelId');
@@ -124,12 +123,10 @@ class ConfigurationController extends AbstractController {
 	 * @throws \WeArePlanet\Sdk\Http\ConnectionException
 	 * @throws \WeArePlanet\Sdk\VersioningException
 	 *
-	 * @Route(
-	 *     "/api/_action/weareplanet/configuration/register-web-hooks",
-	 *     name="api.action.weareplanet.configuration.register-web-hooks",
-	 *     methods={"POST"}
-	 *   )
 	 */
+    #[Route("/api/_action/weareplanet/configuration/register-web-hooks",
+        name: "api.action.weareplanet.configuration.register-web-hooks",
+        methods: ['POST'])]
 	public function registerWebHooks(Request $request): JsonResponse
 	{
 		$settings = $this->settingsService->getSettings();
@@ -157,12 +154,10 @@ class ConfigurationController extends AbstractController {
 	 * @throws \WeArePlanet\Sdk\Http\ConnectionException
 	 * @throws \WeArePlanet\Sdk\VersioningException
 	 *
-	 * @Route(
-	 *     "/api/_action/weareplanet/configuration/check-api-connection",
-	 *     name="api.action.weareplanet.configuration.check-api-connection",
-	 *     methods={"POST"}
-	 *   )
 	 */
+    #[Route("/api/_action/weareplanet/configuration/check-api-connection",
+        name: "api.action.weareplanet.configuration.check-api-connection",
+        methods: ['POST'])]
 	public function checkApiConnection(Request $request): JsonResponse
 	{
 		$spaceId = (int)$request->request->getInt('spaceId');
@@ -191,12 +186,10 @@ class ConfigurationController extends AbstractController {
 	 * @param \Shopware\Core\Framework\Context          $context
 	 * @return \Symfony\Component\HttpFoundation\JsonResponse
 	 *
-	 * @Route(
-	 *     "/api/_action/weareplanet/configuration/synchronize-payment-method-configuration",
-	 *     name="api.action.weareplanet.configuration.synchronize-payment-method-configuration",
-	 *     methods={"POST"}
-	 *   )
 	 */
+    #[Route("/api/_action/weareplanet/configuration/synchronize-payment-method-configuration",
+        name: "api.action.weareplanet.configuration.synchronize-payment-method-configuration",
+        methods: ['POST'])]
 	public function synchronizePaymentMethodConfiguration(Request $request, Context $context): JsonResponse
 	{
 		$settings = $this->settingsService->getSettings();
@@ -228,12 +221,10 @@ class ConfigurationController extends AbstractController {
 	 * @param \Shopware\Core\Framework\Context $context
 	 * @return \Symfony\Component\HttpFoundation\JsonResponse
 	 *
-	 * @Route(
-	 *     "/api/_action/weareplanet/configuration/install-order-delivery-states",
-	 *     name="api.action.weareplanet.configuration.install-order-delivery-states",
-	 *     methods={"POST"}
-	 *   )
 	 */
+    #[Route("/api/_action/weareplanet/configuration/install-order-delivery-states",
+        name: "api.action.weareplanet.configuration.install-order-delivery-states",
+        methods: ['POST'])]
 	public function installOrderDeliveryStates(Context $context): JsonResponse
 	{
 		/**

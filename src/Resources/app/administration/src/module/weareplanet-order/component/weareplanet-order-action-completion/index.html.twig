@@ -6,7 +6,8 @@
 	{% block weareplanet_order_action_completion_amount %}
 		<sw-checkbox-field
 				:label="$tc('weareplanet-order.captureAction.button.text')"
-				v-model="isCompletion"></sw-checkbox-field>
+				v-model:value="isCompletion">
+        </sw-checkbox-field>
 	{% endblock %}
 
 	{% block weareplanet_order_action_completion_confirm_button %}
