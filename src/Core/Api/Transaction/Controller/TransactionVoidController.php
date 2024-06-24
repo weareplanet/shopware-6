@@ -9,7 +9,7 @@ use Symfony\Component\{
 	HttpFoundation\JsonResponse,
 	HttpFoundation\Request,
 	HttpFoundation\Response,
-	Routing\Annotation\Route};
+	Routing\Attribute\Route};
 use WeArePlanet\Sdk\{
 	Model\TransactionState};
 use WeArePlanetPayment\Core\Settings\Service\SettingsService;

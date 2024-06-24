@@ -15,8 +15,8 @@ Module.register('weareplanet-order', {
 	name: 'WeArePlanet',
 	title: 'weareplanet-order.general.title',
 	description: 'weareplanet-order.general.descriptionTextModule',
-	version: '1.0.0',
-	targetVersion: '1.0.0',
+	version: '1.0.1',
+	targetVersion: '1.0.1',
 	color: '#2b52ff',
 
 	snippets: {
