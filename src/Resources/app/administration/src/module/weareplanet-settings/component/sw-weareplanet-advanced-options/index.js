@@ -10,10 +10,6 @@ Component.register('sw-weareplanet-advanced-options', {
 
 	name: 'WeArePlanetAdvancedOptions',
 
-	inject: [
-		'acl'
-	],
-
 	mixins: [
 		Mixin.getByName('notification')
 	],
@@ -40,6 +36,9 @@ Component.register('sw-weareplanet-advanced-options', {
 		return {
 			...constants
 		};
+	},
+
+	computed: {
 	},
 
 	methods: {

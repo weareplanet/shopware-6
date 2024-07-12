@@ -3,13 +3,13 @@
 namespace WeArePlanetPayment\Core\Api\Transaction\Controller;
 
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Log\Package;
+use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\{
 	HttpFoundation\JsonResponse,
 	HttpFoundation\Request,
 	HttpFoundation\Response,
-	Routing\Attribute\Route};
+	Routing\Annotation\Route};
 use WeArePlanet\Sdk\{
 	Model\TransactionState};
 use WeArePlanetPayment\Core\Settings\Service\SettingsService;
@@ -19,9 +19,8 @@ use WeArePlanetPayment\Core\Settings\Service\SettingsService;
  *
  * @package WeArePlanetPayment\Core\Api\Transaction\Controller
  *
+ * @Route(defaults={"_routeScope"={"api"}})
  */
-#[Package('sales-channel')]
-#[Route(defaults: ['_routeScope' => ['api']])]
 class TransactionVoidController extends AbstractController {
 
 	/**
@@ -62,10 +61,12 @@ class TransactionVoidController extends AbstractController {
 	 * @throws \WeArePlanet\Sdk\Http\ConnectionException
 	 * @throws \WeArePlanet\Sdk\VersioningException
 	 *
+	 * @Route(
+	 *     "/api/_action/weareplanet/transaction-void/create-transaction-void/",
+	 *     name="api.action.weareplanet.transaction-void.create-transaction-void",
+	 *     methods={"POST"}
+	 *     )
 	 */
-    #[Route("/api/_action/weareplanet/transaction-void/create-transaction-void/",
-    	name: "api.action.weareplanet.transaction-void.create-transaction-void",
-        methods: ['POST'])]
 	public function createTransactionVoid(Request $request): JsonResponse
 	{
 		$salesChannelId = $request->request->get('salesChannelId');
