@@ -1,0 +1,2 @@
+monolog:
+    channels: ['weareplanet_payment']

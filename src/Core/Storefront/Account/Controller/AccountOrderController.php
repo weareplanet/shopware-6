@@ -6,23 +6,22 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\{
 	Checkout\Cart\Exception\CustomerNotLoggedInException,
 	Checkout\Customer\CustomerEntity,
-	Framework\Routing\Annotation\RouteScope,
 	PlatformRequest,
 	System\SalesChannel\SalesChannelContext};
 use Shopware\Storefront\Controller\StorefrontController;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\{
 	HttpFoundation\HeaderUtils,
 	HttpFoundation\RequestStack,
 	HttpFoundation\Response,
-	Routing\Annotation\Route,
+	Routing\Attribute\Route,
 	Security\Core\Exception\AccessDeniedException};
 use WeArePlanetPayment\Core\{
 	Api\Transaction\Service\TransactionService,
 	Settings\Service\SettingsService};
 
-/**
- * @Route(defaults={"_routeScope"={"storefront"}})
- */
+#[Package('storefront')]
+#[Route(defaults: ['_routeScope' => ['storefront']])]
 class AccountOrderController extends StorefrontController {
 
 	/**
@@ -73,12 +72,10 @@ class AccountOrderController extends StorefrontController {
 	 * @throws \WeArePlanet\Sdk\ApiException
 	 * @throws \WeArePlanet\Sdk\Http\ConnectionException
 	 * @throws \WeArePlanet\Sdk\VersioningException
-	 * @Route(
-	 *     "/weareplanet/account/order/download/invoice/document/{orderId}",
-	 *     name="frontend.weareplanet.account.order.download.invoice.document",
-	 *     methods={"GET"}
-	 *     )
 	 */
+    #[Route("/weareplanet/account/order/download/invoice/document/{orderId}",
+    	name: "frontend.weareplanet.account.order.download.invoice.document",
+        methods: ['GET'])]
 	public function downloadInvoiceDocument(string $orderId, SalesChannelContext $salesChannelContext): Response
 	{
 		$customer          = $this->getLoggedInCustomer();

@@ -38,9 +38,6 @@ Component.register('sw-weareplanet-storefront-options', {
 		};
 	},
 
-	computed: {
-	},
-
 	methods: {
 		checkTextFieldInheritance(value) {
 			if (typeof value !== 'string') {

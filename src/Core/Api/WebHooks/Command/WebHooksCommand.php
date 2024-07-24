@@ -5,6 +5,7 @@ namespace WeArePlanetPayment\Core\Api\WebHooks\Command;
 
 use Symfony\Component\{
 	Console\Command\Command,
+    Console\Attribute\AsCommand,
 	Console\Input\InputInterface,
 	Console\Output\OutputInterface};
 use WeArePlanetPayment\Core\Api\WebHooks\Service\WebHooksService;
@@ -14,12 +15,8 @@ use WeArePlanetPayment\Core\Api\WebHooks\Service\WebHooksService;
  *
  * @package WeArePlanetPayment\Core\Api\WebHooks\Command
  */
+#[AsCommand(name: 'weareplanet:webhooks:install')]
 class WebHooksCommand extends Command {
-
-	/**
-	 * @var string
-	 */
-	protected static $defaultName = 'weareplanet:webhooks:install';
 
 	/**
 	 * @var \WeArePlanetPayment\Core\Api\WebHooks\Service\WebHooksService
@@ -33,7 +30,7 @@ class WebHooksCommand extends Command {
 	 */
 	public function __construct(WebHooksService $webHooksService)
 	{
-		parent::__construct(self::$defaultName);
+		parent::__construct();
 		$this->webHooksService = $webHooksService;
 	}
 
