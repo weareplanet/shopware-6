@@ -20,7 +20,9 @@
 	  "button": {
 		"description": "Klicken Sie auf diese Schaltfläche, um WeArePlanet als Standard-Zahlungsabwickler im ausgewählten Vertriebskanal festzulegen",
 		"label": "WeArePlanet als Standard-Zahlungsabwickler festlegen"
-	  }
+	  },
+	  "messageDefaultPaymentError": "WeArePlanet als Standard-Zahlungsabwickler konnte nicht festgelegt werden..",
+	  "messageDefaultPaymentUpdated": "WeArePlanet als Standard-Zahlungsabwickler wurde festgelegt."
 	},
 	"settingForm": {
 	  "credentials": {

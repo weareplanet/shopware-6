@@ -3,13 +3,13 @@
 namespace WeArePlanetPayment\Core\Api\Transaction\Controller;
 
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\{
 	HttpFoundation\JsonResponse,
 	HttpFoundation\Request,
 	HttpFoundation\Response,
-	Routing\Annotation\Route};
+	Routing\Attribute\Route};
 use WeArePlanet\Sdk\{
 	Model\TransactionState};
 use WeArePlanetPayment\Core\Settings\Service\SettingsService;
@@ -20,8 +20,9 @@ use WeArePlanetPayment\Core\Settings\Service\SettingsService;
  *
  * @package WeArePlanetPayment\Core\Api\Transaction\Controller
  *
- * @Route(defaults={"_routeScope"={"api"}})
  */
+#[Package('sales-channel')]
+#[Route(defaults: ['_routeScope' => ['api']])]
 class TransactionCompletionController extends AbstractController {
 
 	/**
@@ -62,12 +63,10 @@ class TransactionCompletionController extends AbstractController {
 	 * @throws \WeArePlanet\Sdk\Http\ConnectionException
 	 * @throws \WeArePlanet\Sdk\VersioningException
 	 *
-	 * @Route(
-	 *     "/api/_action/weareplanet/transaction-completion/create-transaction-completion/",
-	 *     name="api.action.weareplanet.transaction-completion.create-transaction-completion",
-	 *     methods={"POST"}
-	 *     )
 	 */
+    #[Route("/api/_action/weareplanet/transaction-completion/create-transaction-completion/",
+    	name: "api.action.weareplanet.transaction-completion.create-transaction-completion",
+        methods: ['POST'])]
 	public function createTransactionCompletion(Request $request): JsonResponse
 	{
 		$salesChannelId = $request->request->get('salesChannelId');
