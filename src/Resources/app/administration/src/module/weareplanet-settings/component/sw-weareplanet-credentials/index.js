@@ -10,10 +10,6 @@ Component.register('sw-weareplanet-credentials', {
 
     name: 'WeArePlanetCredentials',
 
-    inject: [
-        'acl'
-    ],
-
     mixins: [
         Mixin.getByName('notification')
     ],
@@ -59,6 +55,10 @@ Component.register('sw-weareplanet-credentials', {
         isTesting: {
             type: Boolean,
             required: false
+        },
+        isShowcase: {
+            type: Boolean,
+            required: true
         }
     },
 
@@ -67,6 +67,8 @@ Component.register('sw-weareplanet-credentials', {
             ...constants
         };
     },
+
+    computed: {},
 
     methods: {
 
