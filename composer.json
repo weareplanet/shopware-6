@@ -1,63 +1,63 @@
 {
-    "authors": [
-        {
-            "homepage": "https://www.weareplanet.com/",
-            "name": "WeArePlanet"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "WeArePlanetPayment\\": "src/"
-        }
-    },
-    "description": "WeArePlanet integration for Shopware 6",
-    "extra": {
-        "copyright": "(c) by WeArePlanet",
-        "description": {
-            "de-DE": "WeArePlanet integration f\u00fcr Shopware 6",
-            "en-GB": "WeArePlanet integration for Shopware 6",
-            "fr-FR": "Int\u00e9gration de WeArePlanet pour Shopware 6",
-            "it-IT": "Integrazione WeArePlanet per Shopware"
-        },
-        "label": {
-            "de-DE": "WeArePlanet Produkte f\u00fcr Shopware 6",
-            "en-GB": "WeArePlanet Products for Shopware 6",
-            "fr-FR": "WeArePlanet Produits for Shopware 6",
-            "it-IT": "WeArePlanet Prodotti per Shopware 6"
-        },
-        "manufacturerLink": {
-            "de-DE": "https://www.weareplanet.com/",
-            "en-GB": "https://www.weareplanet.com/",
-            "fr-FR": "https://www.weareplanet.com/",
-            "it-IT": "https://www.weareplanet.com/"
-        },
-        "supportLink": {
-            "de-DE": "https://paymentshub.weareplanet.com/space/select?target=/support",
-            "en-GB": "https://paymentshub.weareplanet.com/space/select?target=/support",
-            "fr-FR": "https://paymentshub.weareplanet.com/space/select?target=/support",
-            "it-IT": "https://paymentshub.weareplanet.com/space/select?target=/support"
-        },
-        "shopware-plugin-class": "WeArePlanetPayment\\WeArePlanetPayment"
-    },
-    "homepage": "https://www.weareplanet.com//",
-    "keywords": [
-        "WeArePlanet",
-        "payment",
-        "php",
-        "shopware"
-    ],
-    "license": "Apache-2.0",
-    "name": "weareplanet/shopware-6",
-    "require": {
-        "ext-curl": "*",
-        "ext-json": "*",
-        "ext-mbstring": "*",
-        "php": ">=8.2",
-        "shopware/core": "6.6.*",
-        "shopware/administration": "~6.6.0",
-        "shopware/storefront": "6.6.*",
-        "weareplanet/sdk": "4.6.0"
-    },
-    "type": "shopware-platform-plugin",
-    "version": "6.1.11"
+  "authors": [
+	{
+	  "homepage": "https://www.weareplanet.com/",
+	  "name": "WeArePlanet"
+	}
+  ],
+  "autoload": {
+	"psr-4": {
+	  "WeArePlanetPayment\\": "src/"
+	}
+  },
+  "description": "WeArePlanet integration for Shopware 6",
+  "extra": {
+	"copyright": "(c) by WeArePlanet",
+	"description": {
+	  "de-DE": "WeArePlanet integration für Shopware 6",
+	  "en-GB": "WeArePlanet integration for Shopware 6",
+	  "fr-FR": "Intégration de WeArePlanet pour Shopware 6",
+      "it-IT": "Integrazione WeArePlanet per Shopware"
+	},
+	"label": {
+	  "de-DE": "WeArePlanet Produkte für Shopware 6",
+	  "en-GB": "WeArePlanet Products for Shopware 6",
+	  "fr-FR": "WeArePlanet Produits for Shopware 6",
+	  "it-IT": "WeArePlanet Prodotti per Shopware 6"
+	},
+	"manufacturerLink": {
+	  "de-DE": "https://www.weareplanet.com/",
+	  "en-GB": "https://www.weareplanet.com/",
+	  "fr-FR": "https://www.weareplanet.com/",
+      "it-IT": "https://www.weareplanet.com/"
+	},
+	"supportLink": {
+	  "de-DE": "https://paymentshub.weareplanet.com/space/select?target=/support",
+	  "en-GB": "https://paymentshub.weareplanet.com/space/select?target=/support",
+	  "fr-FR": "https://paymentshub.weareplanet.com/space/select?target=/support",
+      "it-IT": "https://paymentshub.weareplanet.com/space/select?target=/support"
+	},
+	"shopware-plugin-class": "WeArePlanetPayment\\WeArePlanetPayment"
+  },
+  "homepage": "https://www.weareplanet.com//",
+  "keywords": [
+	"WeArePlanet",
+	"payment",
+	"php",
+	"shopware"
+  ],
+  "license": "Apache-2.0",
+  "name": "weareplanet/shopware-6",
+  "require": {
+	"ext-curl": "*",
+	"ext-json": "*",
+	"ext-mbstring": "*",
+	"php": ">=8.2",
+    "shopware/core": "~6.6.0",
+    "shopware/administration": "~6.6.0",
+    "shopware/storefront":"~6.6.0",
+    "weareplanet/sdk": "^4.0.0"
+  },
+  "type": "shopware-platform-plugin",
+  "version": "6.1.12"
 }
