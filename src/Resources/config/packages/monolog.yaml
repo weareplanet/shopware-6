@@ -1,9 +1,0 @@
-monolog:
-    channels: ['weareplanet_payment']
-    handlers:
-        security:
-            # log all messages (since debug is the lowest level)
-            level: debug
-            type: stream
-            path: '%kernel.logs_dir%/weareplanet.log'
-            channels: [ 'weareplanet_payment' ]
