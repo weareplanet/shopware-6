@@ -1,3 +1,8 @@
+# 7.1.0
+– Unterstützung für Abonnement-Zahlungsmethoden
+– Support für Shopware 6.7.2.0
+– Problem mit fehlerhafter Bearbeitung der Versandkosten behoben
+
 # 7.0.1
 - Plugin-Versionsmetrik hinzugefügt
 - Fehlermeldung behoben, wenn der Rückerstattungsbetrag den Gesamtbetrag überschreitet

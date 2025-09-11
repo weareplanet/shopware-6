@@ -56,6 +56,7 @@ class TransactionPayload extends AbstractPayload
 
     public const ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_SPACE_ID = 'weareplanet_space_id';
     public const ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TRANSACTION_ID = 'weareplanet_transaction_id';
+    public const ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TOKEN = 'weareplanet_token';
 
     public const WEAREPLANET_METADATA_SALES_CHANNEL_ID = 'salesChannelId';
     public const WEAREPLANET_METADATA_ORDER_ID = 'orderId';
@@ -457,7 +458,7 @@ class TransactionPayload extends AbstractPayload
      */
     protected function addOptionalLineItems(array &$lineItems): void
     {
-        if (count($this->order->getShippingCosts()->getCalculatedTaxes()) === 1) {
+        if ($this->order->getShippingCosts() && $this->order->getShippingTotal() > 0) {
             if ($shippingLineItem = $this->getShippingLineItem()) {
                 $lineItems[] = $shippingLineItem;
             }
@@ -728,12 +729,21 @@ class TransactionPayload extends AbstractPayload
     {
         $lineItem = null;
 
-        $lineItemPriceTotal = array_sum(array_map(static function (LineItemCreate $lineItem) {
-            return $lineItem->getAmountIncludingTax();
-        }, $lineItems));
+        // Calculate total of all current line items
+        $lineItemPriceTotal = array_sum(array_map(static fn(LineItemCreate $li) => $li->getAmountIncludingTax(), $lineItems));
 
-        $adjustmentPrice = $this->order->getAmountTotal() - $lineItemPriceTotal;
-        $adjustmentPrice = self::round($adjustmentPrice);
+        $this->logger->debug("LineItem price total before adjustment: $lineItemPriceTotal");
+        // Get shipping total including taxes from the order
+        $shippingCosts = $this->order->getShippingCosts();
+        $shippingTotal = $shippingCosts ? self::round($shippingCosts->getTotalPrice()) : 0.0;
+
+        // Add shipping to the line items total if it's not already included
+        $hasShippingLineItem = array_filter($lineItems, static fn(LineItemCreate $li) => $li->getType() === LineItemType::SHIPPING);
+        if (!$hasShippingLineItem && $shippingTotal > 0) {
+            $lineItemPriceTotal += $shippingTotal;
+        }
+
+        $adjustmentPrice = self::round($this->order->getAmountTotal() - $lineItemPriceTotal);
 
         if (abs($adjustmentPrice) != 0) {
             if ($this->settings->isLineItemConsistencyEnabled()) {

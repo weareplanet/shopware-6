@@ -16,22 +16,23 @@ use Shopware\Core\{
 };
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use WeArePlanet\Sdk\{
-    Model\AddressCreate,
-    Model\ChargeAttempt,
-    Model\CreationEntityState,
-    Model\CriteriaOperator,
-    Model\EntityQuery,
-    Model\EntityQueryFilter,
-    Model\EntityQueryFilterType,
-    Model\Gender,
-    Model\LineItemAttributeCreate,
-    Model\LineItemCreate,
-    Model\LineItemType,
-    Model\Transaction,
-    Model\TransactionCreate,
-    Model\TransactionPending,
-    Model\TransactionState,
+use WeArePlanet\Sdk\Model\{
+    AddressCreate,
+    ChargeAttempt,
+    CreationEntityState,
+    CriteriaOperator,
+    EntityQuery,
+    EntityQueryFilter,
+    EntityQueryFilterType,
+    Gender,
+    LineItemAttributeCreate,
+    LineItemCreate,
+    LineItemType,
+    TokenizationMode,
+    Transaction,
+    TransactionCreate,
+    TransactionPending,
+    TransactionState,
 };
 use WeArePlanetPayment\Core\{
     Api\OrderDeliveryState\Handler\OrderDeliveryStateHandler,
@@ -193,6 +194,25 @@ class TransactionService
         $this->holdDelivery($orderTransaction->getOrder()->getId(), $salesChannelContext->getContext());
 
         return $redirectUrl;
+    }
+
+    /**
+     * Creates the transaction in the portal using the SDK.
+     *
+     * @return void
+     */
+    public function createRecurringTransaction(TransactionCreate $sdkTransactionCreate, string $spaceId = ""): Transaction {
+        $settings = $this->settingsService->getSettings();
+        if (empty($spaceId)) {
+            $spaceId = $settings->getSpaceId();
+        }
+
+        $sdkTransaction = $settings->getApiClient()->getTransactionService()->create($spaceId, $sdkTransactionCreate);
+        if ($sdkTransaction->valid()) {
+            return $settings->getApiClient()->getTransactionService()->processWithoutUserInteraction($spaceId, $sdkTransaction->getId());
+        }
+
+        throw new \Exception("The transacion is not valid and could not be created.");
     }
 
     /**
@@ -391,7 +411,7 @@ class TransactionService
      * @throws \WeArePlanet\Sdk\Http\ConnectionException
      * @throws \WeArePlanet\Sdk\VersioningException
      */
-    public function read(int $transactionId, string $salesChannelId): Transaction
+    public function read(int $transactionId, string $salesChannelId = ""): Transaction
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
         return $settings->getApiClient()->getTransactionService()->read($settings->getSpaceId(), $transactionId);
@@ -598,7 +618,8 @@ class TransactionService
                 ->setCustomerEmailAddress($customer->getEmail())
                 ->setCustomerId($customerId)
                 ->setSuccessUrl($homeUrl . '?success')
-                ->setFailedUrl($homeUrl . '?fail');
+                ->setFailedUrl($homeUrl . '?fail')
+                ->setTokenizationMode(TokenizationMode::FORCE_CREATION);
 
             $transactionService = $settings->getApiClient()->getTransactionService();
             $transaction = $transactionService->create($settings->getSpaceId(), $transactionPayload);

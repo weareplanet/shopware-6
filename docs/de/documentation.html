@@ -23,7 +23,7 @@
 		</a>
 	</li>
 	<li>
-		<a href="https://github.com/weareplanet/shopware-6/releases/tag/7.0.1/">
+		<a href="https://github.com/weareplanet/shopware-6/releases/tag/7.1.0/">
 			Source
 		</a>
 	</li>
@@ -52,7 +52,7 @@
 					<div class="ulist">
 <ul>
 <li>
-<p>Shopware Version: 6.5.x oder 6.6.x (see <a href="#compatibility">Kompatibilitätstabelle</a>).</p>
+<p>Shopware Version: 6.5.x, 6.6.x oder 6.7.x (see <a href="#compatibility">Kompatibilitätstabelle</a>).</p>
 </li>
 <li>
 <p>PHP: Mindestversion, wie von Ihrer Shopware-Installation erforderlich (z.B. 7.4+).</p>
@@ -77,22 +77,28 @@
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Shopware Version</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Plugin Version</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PHP Version</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Support Until</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Shopware-Version</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Plugin-Version</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PHP-Version</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Unterstützt bis</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.7.x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7.x.x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PHP 8.2 und 8.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Laufend</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">6.6.x</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">6.x.x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PHP 8.2 and 8.3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Ongoing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PHP 8.2 und 8.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dezember 2025</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6.5.x - Deprecated</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.5.x – Veraltet</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5.x.x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PHP 8.2 and 8.3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">October 2024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PHP 8.2 und 8.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Oktober 2024</p></td>
 </tr>
 </tbody>
 </table>					</div>
@@ -185,7 +191,7 @@ php bin/console plugin:install --activate --clearCache WeArePlanetPayment</code>
 	</div>
 	<div class="chapter-body">
 					<div class="paragraph">
-<p>Gehen Sie zu <a href="https://www.weareplanet.com/contact/sales/user/login">WeArePlanet</a> und erstellen Sie ein Konto, falls Sie noch keines haben.</p>
+<p>Gehen Sie zu <a href="https://www.weareplanet.com/contact/sales">WeArePlanet</a> und erstellen Sie ein Konto, falls Sie noch keines haben.</p>
 </div><div class="admonitionblock tip">
 <table>
 <tr>
@@ -714,10 +720,20 @@ Die Tokenisierung ist für Gast-Checkouts nicht verfügbar
 </tr>
 </table>
 </div>					</div>
+</div>					<div class="section" id="_wiederkehrende_zahlungen">
+	<div class="section-title">
+		<h2>
+			<span class="title-number">8.7</span>Wiederkehrende Zahlungen					</h2>
+	</div>
+	<div class="section-body">
+					<div class="paragraph">
+<p>Shopware bietet das Paket "Shopware Commercial" mit zusätzlichen Funktionen, unter anderem Abonnements. Dieses Plugin unterstützt Zahlungen, die für Abonnements geeignet sind. Solange der Konnektor der Zahlungsmethode
+Tokenisierung unterstützt, kann er für Abonnements verwendet werden. Die wiederkehrende Zahlung wird vollständig vom Shopware Commercial Plugin verwaltet. Weitere Informationen finden Sie in deren Dokumentation.</p>
+</div>					</div>
 </div>					<div class="section" id="_hauptfunktionen">
 	<div class="section-title">
 		<h2>
-			<span class="title-number">8.7</span>Hauptfunktionen					</h2>
+			<span class="title-number">8.8</span>Hauptfunktionen					</h2>
 	</div>
 	<div class="section-body">
 					<div class="ulist">
@@ -734,12 +750,15 @@ Die Tokenisierung ist für Gast-Checkouts nicht verfügbar
 <li>
 <p><strong>Automatic Updates</strong>: Zahlungsmethoden werden dynamisch über die WeArePlanet API synchronisiert.</p>
 </li>
+<li>
+<p><strong>Wiederkehrende Zahlungen</strong>: Führen Sie wiederkehrende Zahlungen mit Abonnements (Shopware Commercial) und WeArePlanet durch.</p>
+</li>
 </ul>
 </div>					</div>
 </div>					<div class="section" id="_fehlerbehebung">
 	<div class="section-title">
 		<h2>
-			<span class="title-number">8.8</span>Fehlerbehebung					</h2>
+			<span class="title-number">8.9</span>Fehlerbehebung					</h2>
 	</div>
 	<div class="section-body">
 					<div class="ulist">
@@ -771,7 +790,7 @@ tail -f var/log/whitelabelname_payment*.log</code></pre>
 </div>					<div class="section" id="_faqs">
 	<div class="section-title">
 		<h2>
-			<span class="title-number">8.9</span>FAQs					</h2>
+			<span class="title-number">8.10</span>FAQs					</h2>
 	</div>
 	<div class="section-body">
 					<div class="paragraph">
@@ -965,18 +984,23 @@ A: Ja, das Plugin unterstützt Wallets wie Apple Pay.</p>
 		<span class="item-title">Tokenisierung</span>
 			</a>
     </li>    		    			<li class="nav-level-2">
-	<a href="#_hauptfunktionen">
+	<a href="#_wiederkehrende_zahlungen">
 		<span class="item-number">8.7</span>
+		<span class="item-title">Wiederkehrende Zahlungen</span>
+			</a>
+    </li>    		    			<li class="nav-level-2">
+	<a href="#_hauptfunktionen">
+		<span class="item-number">8.8</span>
 		<span class="item-title">Hauptfunktionen</span>
 			</a>
     </li>    		    			<li class="nav-level-2">
 	<a href="#_fehlerbehebung">
-		<span class="item-number">8.8</span>
+		<span class="item-number">8.9</span>
 		<span class="item-title">Fehlerbehebung</span>
 			</a>
     </li>    		    			<li class="nav-level-2">
 	<a href="#_faqs">
-		<span class="item-number">8.9</span>
+		<span class="item-number">8.10</span>
 		<span class="item-title">FAQs</span>
 			</a>
     </li>    		    	</ul>

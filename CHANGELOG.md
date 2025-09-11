@@ -1,3 +1,11 @@
+# 7.1.0
+## Feature
+- Support subscription payment methods
+- Support Shopware 6.7.2.0
+
+## Bugfix
+- Fixed issue with shipping costs not being processed correctly
+
 # 7.0.1
 ## Feature
 - Add plugin version metric

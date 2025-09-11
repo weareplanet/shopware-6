@@ -13,10 +13,10 @@ Please note that this plugin is for versions 6.5, 6.6 or 6.7. For the 6.4 plugin
 
 ## Documentation
 
-- For English documentation click [here](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.0.1/docs/en/documentation.html)
-- Für die deutsche Dokumentation klicken Sie [hier](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.0.1/docs/de/documentation.html)
-- Pour la documentation Française, cliquez [ici](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.0.1/docs/fr/documentation.html)
-- Per la documentazione in tedesco, clicca [qui](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.0.1/docs/it/documentation.html)
+- For English documentation click [here](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.1.0/docs/en/documentation.html)
+- Für die deutsche Dokumentation klicken Sie [hier](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.1.0/docs/de/documentation.html)
+- Pour la documentation Française, cliquez [ici](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.1.0/docs/fr/documentation.html)
+- Per la documentazione in tedesco, clicca [qui](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/7.1.0/docs/it/documentation.html)
 
 ## Installation
 
@@ -60,6 +60,8 @@ Configure supported methods (e.g., credit cards, Apple Pay) via the [WeArePlanet
 **Multi-Store Support**: Manage configurations across multiple stores.
 
 **Automatic Updates**: Payment methods sync dynamically via the WeArePlanet API.
+
+**Subscriptions**: Make recurring payments with Subscriptions (Shopware Commercial) and WeArePlanet.
 
 ## Compatibiliity
 

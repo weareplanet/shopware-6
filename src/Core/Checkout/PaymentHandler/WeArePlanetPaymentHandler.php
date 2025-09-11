@@ -4,8 +4,10 @@ namespace WeArePlanetPayment\Core\Checkout\PaymentHandler;
 
 use Psr\Log\LoggerInterface;
 use Shopware\Core\{
+    Checkout\Order\OrderEntity,
     Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity,
     Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler,
+    Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates,
     Checkout\Payment\Cart\PaymentTransactionStruct,
     Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler,
     Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType,
@@ -16,9 +18,11 @@ use Shopware\Core\{
     Framework\Context,
     Framework\DataAbstractionLayer\EntityRepository,
     Framework\DataAbstractionLayer\Search\Criteria,
+    Framework\DataAbstractionLayer\Search\Filter\EqualsFilter,
     Framework\DataAbstractionLayer\Search\Sorting\FieldSorting,
     Framework\Struct\Struct,
     Framework\Validation\DataBag\RequestDataBag,
+    System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity,
     System\SalesChannel\Context\SalesChannelContextService,
     System\SalesChannel\Context\SalesChannelContextServiceParameters
 };
@@ -33,7 +37,9 @@ use Symfony\Component\{
     HttpFoundation\Request
 };
 use WeArePlanet\Sdk\Model\TransactionState;
-use WeArePlanetPayment\Core\Api\Transaction\Service\TransactionService;
+use WeArePlanetPayment\Core\Api\Transaction\Service\TransactionService as PluginTransactionService;
+use WeArePlanetPayment\Core\Util\Payload\TransactionPayload;
+
 
 
 /**
@@ -50,9 +56,9 @@ class WeArePlanetPaymentHandler extends AbstractPaymentHandler
     private CustomCartPersister $cartPersister;
 
     /**
-     * @var \WeArePlanetPayment\Core\Api\Transaction\Service\TransactionService
+     * @var \WeArePlanetPayment\Core\Api\Transaction\Service\PluginTransactionService
      */
-    protected $transactionService;
+    protected $pluginTransactionService;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -67,28 +73,26 @@ class WeArePlanetPaymentHandler extends AbstractPaymentHandler
 
     protected EntityRepository $orderTransactionRepository;
 
+    protected ?EntityRepository $subscriptionRepository;
+
     /**
      * WeArePlanetPaymentHandler constructor.
-     *
-     * @param \WeArePlanetPayment\Core\Api\Transaction\Service\TransactionService $transactionService
-     * @param \Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler $orderTransactionStateHandler
-     * @param SalesChannelContextService $salesChannelContextService
-     * @param EntityRepository $orderTransactionRepository
      */
     public function __construct(
         CustomCartPersister $cartPersister,
-        TransactionService $transactionService,
+        PluginTransactionService $pluginTransactionService,
         OrderTransactionStateHandler $orderTransactionStateHandler,
         SalesChannelContextService $salesChannelContextService,
-        EntityRepository $orderTransactionRepository
+        EntityRepository $orderTransactionRepository,
+        ?EntityRepository $subscriptionRepository,
     ) {
         $this->cartPersister = $cartPersister;
-        $this->transactionService = $transactionService;
+        $this->pluginTransactionService = $pluginTransactionService;
         $this->orderTransactionStateHandler = $orderTransactionStateHandler;
         $this->salesChannelContextService = $salesChannelContextService;
         $this->orderTransactionRepository = $orderTransactionRepository;
+        $this->subscriptionRepository = $subscriptionRepository;
     }
-
     /**
      * @param \Psr\Log\LoggerInterface $logger
      *
@@ -134,16 +138,15 @@ class WeArePlanetPaymentHandler extends AbstractPaymentHandler
             $redirectUrl = $transaction->getReturnUrl();
 
             if ($orderTransaction->getOrder()->getAmountTotal() > 0) {
-                $transactionId = $_SESSION['transactionId'] ?? null;
+                $transactionId = $request->getSession()->get('transactionId');
                 if ($transactionId === null) {
-                    $this->transactionService->createPendingTransaction($transaction, $salesChannelContext);
+                    $this->pluginTransactionService->createPendingTransaction($salesChannelContext);
                 }
-                $redirectUrl = $this->transactionService->create($transaction, $salesChannelContext);
+                $redirectUrl = $this->pluginTransactionService->create($transaction, $salesChannelContext);
             }
             return new RedirectResponse($redirectUrl);
-
         } catch (\Throwable $e) {
-            unset($_SESSION['transactionId']);
+            $request->getSession()->remove('transactionId');
             $errorMessage = 'An error occurred during the communication with external payment gateway : ' . $e->getMessage();
             $this->logger->critical($errorMessage);
             throw PaymentException::customerCanceled($transaction->getOrderTransaction()->getId(), $errorMessage);
@@ -174,12 +177,12 @@ class WeArePlanetPaymentHandler extends AbstractPaymentHandler
         )->getEntities()->first();
 
         if ($orderTransaction->getOrder()->getAmountTotal() > 0) {
-            $transactionEntity = $this->transactionService->getByOrderId(
+            $transactionEntity = $this->pluginTransactionService->getByOrderId(
                 $orderTransaction->getOrder()->getId(),
                 $context
             );
 
-            $weArePlanetTransaction = $this->transactionService->read(
+            $weArePlanetTransaction = $this->pluginTransactionService->read(
                 $transactionEntity->getTransactionId(),
                 $transactionEntity->getSalesChannelId()
             );
@@ -189,7 +192,7 @@ class WeArePlanetPaymentHandler extends AbstractPaymentHandler
                     ':orderId' => $orderTransaction->getOrder()->getId(),
                     ':salesChannelName' => $transactionEntity->getSalesChannelId(),
                 ]);
-                unset($_SESSION['transactionId']);
+                $request->getSession()->remove('transactionId');
                 $this->logger->info($errorMessage);
                 throw PaymentException::customerCanceled($transaction->getOrderTransaction()->getId(), $errorMessage);
             }
@@ -217,10 +220,240 @@ class WeArePlanetPaymentHandler extends AbstractPaymentHandler
         string $paymentMethodId,
         Context $context
         ): bool {
-        if ($type === PaymentHandlerType::RECURRING) {
-            return false;
-        }
+        // Both PaymentHandlerType::RECURRING and PaymentHandlerType::REFUND are supported
+        //TODO: check that the payment method really supports recurring.
+        // In order to do that, we need to get this information in when synching the payment methods.
+        // The payment methods in the portal are managed by their Connectors. The Connectors need
+        // to support the recurrin and the refunding. These values are 1453357059666L and 1453351315899L for
+        // tokenization and refunding respectively.
         return true;
     }
 
+    public function recurring(
+        PaymentTransactionStruct $transaction,
+        Context $context
+    ): void {
+        if ($this->subscriptionRepository === null || !class_exists(\Shopware\Commercial\Subscription\Entity\Subscription\SubscriptionEntity::class)) {
+            throw PaymentException::paymentTypeUnsupported(
+                $transaction->getOrderTransactionId(),
+                'Shopware Commercial plugin with Subscription feature is not installed or active. Recurring payments cannot be processed.'
+            );
+        }
+
+        if ($transaction->isRecurring() === false) {
+            //TODO: Provide payment-method-id instead of order-transaction-id
+            throw PaymentException::paymentTypeUnsupported($transaction->getOrderTransaction()->getId(), PaymentHandlerType::RECURRING);
+        }
+
+        $recurringData = $transaction->getRecurring();
+        $newTransactionId = $transaction->getOrderTransactionId();
+
+        if ($recurringData === null) {
+            throw PaymentException::recurringInterrupted($newTransactionId, 'Recurring payment data is missing from the transaction struct.');
+        }
+
+        try {
+            // Get information about the subscription
+            $subscriptionId = $recurringData->getSubscriptionId();
+            $criteria = new Criteria([$subscriptionId]);
+            $criteria->addAssociation('orders.transactions.stateMachineState');
+
+            /** @var SubscriptionEntity|null $subscription */
+            $subscription = $this->subscriptionRepository->search($criteria, $context)->get($subscriptionId);
+
+            if ($subscription === null) {
+                throw PaymentException::recurringInterrupted($newTransactionId, sprintf('Subscription with ID "%s" could not be found.', $subscriptionId));
+            }
+
+            // Find the original order and transaction
+            $orders = $subscription->getOrders();
+            if ($orders === null || $orders->count() === 0) {
+                throw PaymentException::recurringInterrupted($newTransactionId, 'No orders found associated with the subscription.');
+            }
+
+            $orders->sort(fn (OrderEntity $a, OrderEntity $b) => $a->getCreatedAt() <=> $b->getCreatedAt());
+            /** @var OrderEntity|null $originalOrder */
+            $originalOrder = $orders->first();
+
+            $originalTransactions = $originalOrder->getTransactions();
+
+            if ($originalTransactions === null) {
+                throw PaymentException::recurringInterrupted($newTransactionId, 'No transactions found on the original order.');
+            }
+
+            /** @var OrderTransactionEntity|null $originalTransaction */
+            $originalTransaction = $originalTransactions->filter(
+                fn (OrderTransactionEntity $t) => $t->getStateMachineState()?->getTechnicalName() === OrderTransactionStates::STATE_PAID
+            )->first();
+
+            if ($originalTransaction === null) {
+                throw PaymentException::recurringInterrupted($newTransactionId, 'A successful, paid transaction could not be found on the original order to retrieve payment details.');
+            }
+
+            $newOrderTransaction = $this->orderTransactionRepository->search(
+                (new Criteria([$newTransactionId]))
+                    ->addAssociation('order'), $context
+            )->getEntities()->first();
+            $orderNumber = $newOrderTransaction->getOrder()->getOrderNumber();
+
+            // Access the custom fields for getting the original transaction details
+            $customFields = $originalTransaction->getCustomFields();
+            // The tokenReference is not really needed because it's also stored in the original transaction
+            $tokenReference = $customFields[TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TOKEN] ?? null;
+            $spaceId = (string) $customFields[TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_SPACE_ID] ?? null;
+            $sdkTransactionId = $customFields[TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TRANSACTION_ID] ?? null;
+
+            if ($sdkTransactionId === null || $spaceId === null) {
+                throw PaymentException::recurringInterrupted($newTransactionId, 'Required original transaction ID and spaceId is missing from order transaction custom fields.');
+            }
+
+            /** @var \WeArePlanet\Sdk\Model\Transaction $originalSdkTransaction */
+            $originalSdkTransaction = $this->pluginTransactionService->read($sdkTransactionId, "");
+
+            //TODO: Consider moving this logic to its own function for improved readability
+            $sdkTransactionCreate = new \WeArePlanet\Sdk\Model\TransactionCreate;
+
+            // Build the new transaction based on the original transaction
+            $sdkTransactionCreate->setCurrency($originalSdkTransaction->getCurrency());
+            $sdkTransactionCreate->setBillingAddress($this->addressCreateFromSdk($originalSdkTransaction->getBillingAddress()));
+            $sdkTransactionCreate->setShippingAddress($this->addressCreateFromSdk($originalSdkTransaction->getShippingAddress()));
+            $sdkTransactionCreate->setShippingMethod($originalSdkTransaction->getShippingMethod());
+            $sdkTransactionCreate->setCustomerEmailAddress($originalSdkTransaction->getCustomerEmailAddress());
+            $sdkTransactionCreate->setCustomerId($originalSdkTransaction->getCustomerId());
+            $sdkTransactionCreate->setLanguage($originalSdkTransaction->getLanguage());
+            // Get the merchant reference from the new Order, not the original one
+            $sdkTransactionCreate->setMerchantReference($orderNumber);
+            $sdkTransactionCreate->setInvoiceMerchantReference($originalSdkTransaction->getInvoiceMerchantReference());
+
+            $lineItems = $originalSdkTransaction->getLineItems();
+            $lineItemsCreate = [];
+            foreach ($lineItems as $lineItem) {
+                $lineItemsCreate[] = $this->lineItemCreateFromSdk($lineItem);
+            }
+            if (count($lineItemsCreate) > 0) {
+                $sdkTransactionCreate->setLineItems($lineItemsCreate);
+            }
+
+            $sdkTransactionCreate->setSuccessUrl($originalSdkTransaction->getSuccessUrl());
+            $sdkTransactionCreate->setToken($originalSdkTransaction->getToken());
+            $sdkTransactionCreate->setTokenizationMode($originalSdkTransaction->getTokenizationMode());
+            $sdkTransactionCreate->setMetaData($originalSdkTransaction->getMetaData());
+
+            // Create the new recurring transaction
+            $newSdkTransaction = $this->pluginTransactionService->createRecurringTransaction($sdkTransactionCreate, $spaceId);
+
+            // Set the new state for the new order transaction
+            if (in_array($newSdkTransaction->getState(), [TransactionState::AUTHORIZED, TransactionState::COMPLETED, TransactionState::CONFIRMED, TransactionState::FULFILL])) {
+                $this->orderTransactionStateHandler->paid($newTransactionId, $context);
+            } elseif (in_array($newSdkTransaction->getState(), [TransactionState::DECLINE, TransactionState::FAILED, TransactionState::VOIDED])) {
+                $this->orderTransactionStateHandler->fail($newTransactionId, $context);
+            } elseif (in_array($newSdkTransaction->getState(), [TransactionState::PENDING, TransactionState::PROCESSING])) {
+                $this->orderTransactionStateHandler->process($newTransactionId, $context);
+            } else {
+                $this->orderTransactionStateHandler->reopen($newTransactionId, $context);
+            }
+
+            $data = [
+                'id' => $newTransactionId,
+                'customFields' => [
+                    TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TRANSACTION_ID => $newSdkTransaction->getId(),
+                    TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_SPACE_ID => $spaceId,
+                    TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TOKEN => $tokenReference,
+                ],
+            ];
+
+            // Update the new order transaction with the new transaction details
+            $this->orderTransactionRepository->update([$data], $context);
+            $this->pluginTransactionService->upsert($newSdkTransaction, $context);
+        }
+        catch (\Throwable $e) {
+            $errorMessage = 'An error occurred during the communication with external payment gateway : ' . $e->getMessage();
+            $this->logger->critical($errorMessage);
+            throw PaymentException::recurringInterrupted($transaction->getOrderTransactionId(), $errorMessage);
+        }
+    }
+
+    /**
+     * Creates a new AddressCreate instance from the given SDK Address model.
+     *
+     * @param \WeArePlanet\Sdk\Model\Address $address The address model from the SDK.
+     * @return \WeArePlanet\Sdk\Model\AddressCreate The newly created AddressCreate instance.
+     */
+    private function addressCreateFromSdk(\WeArePlanet\Sdk\Model\Address $address): \WeArePlanet\Sdk\Model\AddressCreate {
+        $addressCreate = new \WeArePlanet\Sdk\Model\AddressCreate;
+
+        $addressCreate->setCity($address->getCity());
+        $addressCreate->setCommercialRegisterNumber($address->getCommercialRegisterNumber());
+        $addressCreate->setCountry($address->getCountry());
+        $addressCreate->setDateOfBirth($address->getDateOfBirth());
+        $addressCreate->setDependentLocality($address->getDependentLocality());
+        $addressCreate->setEmailAddress($address->getEmailAddress());
+        $addressCreate->setFamilyName($address->getFamilyName());
+        $addressCreate->setGender($address->getGender());
+        $addressCreate->setGivenName($address->getGivenName());
+        $addressCreate->setMobilePhoneNumber($address->getMobilePhoneNumber());
+        $addressCreate->setOrganizationName($address->getOrganizationName());
+        $addressCreate->setPhoneNumber($address->getPhoneNumber());
+        $addressCreate->setPostalState($address->getPostalState());
+        $addressCreate->setPostcode($address->getPostcode());
+        $addressCreate->setSalesTaxNumber($address->getSalesTaxNumber());
+        $addressCreate->setSalutation($address->getSalutation());
+        $addressCreate->setSocialSecurityNumber($address->getSocialSecurityNumber());
+        $addressCreate->setSortingCode($address->getSortingCode());
+        $addressCreate->setStreet($address->getStreet());
+
+        return $addressCreate;
+    }
+
+    /**
+     * Creates a LineItemCreate object from a given SDK LineItem.
+     *
+     * This method takes a \WeArePlanet\Sdk\Model\LineItem instance and transforms it into a
+     * \WeArePlanet\Sdk\Model\LineItemCreate object, which can be used for further processing
+     * or integration with the WeArePlanet payment SDK.
+     *
+     * @param \WeArePlanet\Sdk\Model\LineItem $lineItem The line item from the SDK to convert.
+     * @return \WeArePlanet\Sdk\Model\LineItemCreate The created LineItemCreate object.
+     */
+    private function lineItemCreateFromSdk(\WeArePlanet\Sdk\Model\LineItem $lineItem): \WeArePlanet\Sdk\Model\LineItemCreate
+    {
+        $lineItemCreate = new \WeArePlanet\Sdk\Model\LineItemCreate();
+
+        $lineItemCreate->setAmountIncludingTax($lineItem->getAmountIncludingTax());
+
+        $attributes = $lineItem->getAttributes();
+        $attributesCreate = [];
+        foreach ($attributes as $id => $attribute) {
+            $attributeCreate = new \WeArePlanet\Sdk\Model\LineItemAttributeCreate();
+            $attributeCreate->setLabel($attribute->getLabel());
+            $attributeCreate->setValue($attribute->getValue());
+            $attributesCreate[$id] = $attributeCreate;
+        }
+        if (count($attributesCreate) > 0) {
+            $lineItemCreate->setAttributes($attributesCreate);
+        }
+
+        $lineItemCreate->setDiscountIncludingTax($lineItem->getDiscountIncludingTax());
+        $lineItemCreate->setName($lineItem->getName());
+        $lineItemCreate->setQuantity($lineItem->getQuantity());
+        $lineItemCreate->setShippingRequired($lineItem->getShippingRequired());
+        $lineItemCreate->setSku($lineItem->getSku());
+
+        $taxes = $lineItem->getTaxes();
+        $taxesCreate = [];
+        foreach ($taxes as $tax) {
+            $taxCreate = new \WeArePlanet\Sdk\Model\TaxCreate();
+            $taxCreate->setRate($tax->getRate());
+            $taxCreate->setTitle($tax->getTitle());
+            $taxesCreate[] = $taxCreate;
+        }
+        if (count($taxesCreate) > 0) {
+            $lineItemCreate->setTaxes($taxesCreate);
+        }
+
+        $lineItemCreate->setType($lineItem->getType());
+        $lineItemCreate->setUniqueId($lineItem->getUniqueId());
+
+        return $lineItemCreate;
+    }
 }
