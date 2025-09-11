@@ -1,0 +1,24 @@
+{% block weareplanet_order_action_completion %}
+<sw-modal variant="small"
+		  :title="$tc(`weareplanet-order.modal.title.capture`)"
+		  @modal-close="$emit('modal-close')">
+
+	{% block weareplanet_order_action_completion_amount %}
+		<mt-checkbox
+				:label="$tc('weareplanet-order.captureAction.button.text')"
+				v-model:checked="isCompletion">
+        </mt-checkbox>
+	{% endblock %}
+
+	{% block weareplanet_order_action_completion_confirm_button %}
+	<template #modal-footer>
+		<mt-button variant="primary"
+				   @click="completion">
+			{{ $tc('weareplanet-order.refundAction.confirmButton.text') }}
+		</mt-button>
+	</template>
+	{% endblock %}
+
+	<mt-loader v-if="isLoading"></mt-loader>
+</sw-modal>
+{% endblock %}

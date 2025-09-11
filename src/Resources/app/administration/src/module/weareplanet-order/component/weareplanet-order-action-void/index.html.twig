@@ -1,0 +1,25 @@
+{% block weareplanet_order_action_void %}
+<sw-modal variant="small"
+		  :title="$tc(`weareplanet-order.modal.title.void`)"
+		  @modal-close="$emit('modal-close')">
+
+	{% block weareplanet_order_action_void_amount %}
+        {# Review if this v-model:checked="isVoid" needs to change to checked #}
+		<mt-checkbox
+				:label="$tc('weareplanet-order.voidAction.confirm.message')"
+				v-model:checked="isVoid">
+        </mt-checkbox>
+	{% endblock %}
+
+	{% block weareplanet_order_action_void_confirm_button %}
+	<template #modal-footer>
+		<mt-button variant="primary"
+				   @click="voidPayment">
+			{{ $tc('weareplanet-order.refundAction.confirmButton.text') }}
+		</mt-button>
+	</template>
+	{% endblock %}
+
+	<mt-loader v-if="isLoading"></mt-loader>
+</sw-modal>
+{% endblock %}

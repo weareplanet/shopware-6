@@ -1,0 +1,103 @@
+/* global Shopware */
+
+import template from './index.html.twig';
+
+const {Component, Mixin, Filter, Utils} = Shopware;
+
+Component.register('weareplanet-order-action-refund-by-amount', {
+	template,
+
+	inject: ['WeArePlanetRefundService'],
+
+	mixins: [
+		Mixin.getByName('notification')
+	],
+
+	props: {
+		transactionData: {
+			type: Object,
+			required: true
+		},
+
+		orderId: {
+			type: String,
+			required: true
+		}
+	},
+
+	data() {
+		return {
+			isLoading: true,
+			currency: this.transactionData.transactions[0].currency,
+			refundAmount: 0,
+			refundableAmount: 0,
+		};
+	},
+
+	computed: {
+		dateFilter() {
+			return Filter.getByName('date');
+		}
+	},
+
+	created() {
+		this.createdComponent();
+	},
+
+	methods: {
+		createdComponent() {
+			this.isLoading = false;
+			this.currency = this.transactionData.transactions[0].currency;
+			this.refundAmount = Number(this.transactionData.transactions[0].amountIncludingTax);
+			this.refundableAmount = Number(this.transactionData.transactions[0].amountIncludingTax);
+		},
+
+		refundByAmount() {
+			this.isLoading = true;
+			this.WeArePlanetRefundService.createRefundByAmount(
+				this.transactionData.transactions[0].metaData.salesChannelId,
+				this.transactionData.transactions[0].id,
+				this.refundAmount
+			).then(() => {
+				this.createNotificationSuccess({
+					title: this.$tc('weareplanet-order.refundAction.successTitle'),
+					message: this.$tc('weareplanet-order.refundAction.successMessage')
+				});
+				this.isLoading = false;
+				this.$emit('modal-close');
+				this.$nextTick(() => {
+					this.$router.replace(`${this.$route.path}?hash=${Utils.createId()}`);
+				});
+			}).catch((errorResponse) => {
+				try {
+					var errorTitle;
+					var errorMessage;
+					if (errorResponse.response.data == 'refundExceedsAmount') {
+						errorTitle = this.$tc('weareplanet-order.refundAction.refundExceedsTotalError.title');
+						errorMessage = this.$tc('weareplanet-order.refundAction.refundExceedsTotalError.messageRefundAmountExceedsAvailableBalance');
+					} else {
+						errorTitle = errorResponse.response.data.errors[0].title;
+						errorMessage = errorResponse.response.data.errors[0].detail;
+					}
+					this.createNotificationError({
+						title: errorTitle,
+						message: errorMessage,
+						autoClose: false
+					});
+				} catch (e) {
+					this.createNotificationError({
+						title: errorResponse.title,
+						message: errorResponse.message,
+						autoClose: false
+					});
+				} finally {
+					this.isLoading = false;
+					this.$emit('modal-close');
+					this.$nextTick(() => {
+						this.$router.replace(`${this.$route.path}?hash=${Utils.createId()}`);
+					});
+				}
+			});
+		}
+	}
+});
