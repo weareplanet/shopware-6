@@ -8,7 +8,7 @@ use Shopware\Core\{
     Checkout\Cart\CartException,
     Checkout\Cart\LineItem\LineItem,
     Checkout\Order\OrderEntity,
-    Checkout\Payment\Cart\PaymentTransactionStruct,
+    Checkout\Payment\Cart\AsyncPaymentTransactionStruct,
     Framework\Context,
     Framework\DataAbstractionLayer\Search\Criteria,
     Framework\DataAbstractionLayer\Search\Filter\EqualsFilter,
@@ -16,23 +16,22 @@ use Shopware\Core\{
 };
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use WeArePlanet\Sdk\Model\{
-    AddressCreate,
-    ChargeAttempt,
-    CreationEntityState,
-    CriteriaOperator,
-    EntityQuery,
-    EntityQueryFilter,
-    EntityQueryFilterType,
-    Gender,
-    LineItemAttributeCreate,
-    LineItemCreate,
-    LineItemType,
-    TokenizationMode,
-    Transaction,
-    TransactionCreate,
-    TransactionPending,
-    TransactionState,
+use WeArePlanet\Sdk\{
+    Model\AddressCreate,
+    Model\ChargeAttempt,
+    Model\CreationEntityState,
+    Model\CriteriaOperator,
+    Model\EntityQuery,
+    Model\EntityQueryFilter,
+    Model\EntityQueryFilterType,
+    Model\Gender,
+    Model\LineItemAttributeCreate,
+    Model\LineItemCreate,
+    Model\LineItemType,
+    Model\Transaction,
+    Model\TransactionCreate,
+    Model\TransactionPending,
+    Model\TransactionState,
 };
 use WeArePlanetPayment\Core\{
     Api\OrderDeliveryState\Handler\OrderDeliveryStateHandler,
@@ -116,7 +115,7 @@ class TransactionService
      *
      * A redirect to the url will be performed
      *
-     * @param \Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct $transaction
+     * @param \Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct $transaction
      * @param \Shopware\Core\System\SalesChannel\SalesChannelContext $salesChannelContext
      *
      * @return string
@@ -125,14 +124,10 @@ class TransactionService
      * @throws \WeArePlanet\Sdk\VersioningException
      */
     public function create(
-        PaymentTransactionStruct $transaction,
-        SalesChannelContext      $salesChannelContext
+        AsyncPaymentTransactionStruct $transaction,
+        SalesChannelContext           $salesChannelContext
     ): string
     {
-        $criteria = new Criteria([$transaction->getOrderTransactionId()]);
-        $criteria->addAssociation('order');
-        $orderTransaction = $this->container->get('order_transaction.repository')->search($criteria, $salesChannelContext->getContext())->first();
-
         $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
         $settings = $this->settingsService->getSettings($salesChannelId);
         $apiClient = $settings->getApiClient();
@@ -170,7 +165,7 @@ class TransactionService
 
         $redirectUrl = $this->container->get('router')->generate(
             'frontend.weareplanet.checkout.pay',
-            ['orderId' => $orderTransaction->getOrder()->getId(),],
+            ['orderId' => $transaction->getOrder()->getId(),],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
@@ -182,8 +177,8 @@ class TransactionService
         $this->upsert(
             $createdTransaction,
             $salesChannelContext->getContext(),
-            $orderTransaction->getPaymentMethodId(),
-            $orderTransaction->getOrder()->getSalesChannelId()
+            $transaction->getOrderTransaction()->getPaymentMethodId(),
+            $transaction->getOrder()->getSalesChannelId()
         );
         $_SESSION['transactionId'] = null;
         $_SESSION['arrayOfPossibleMethods'] = null;
@@ -191,45 +186,26 @@ class TransactionService
         $_SESSION['currencyCheck'] = null;
 
 
-        $this->holdDelivery($orderTransaction->getOrder()->getId(), $salesChannelContext->getContext());
+        $this->holdDelivery($transaction->getOrder()->getId(), $salesChannelContext->getContext());
 
         return $redirectUrl;
     }
 
     /**
-     * Creates the transaction in the portal using the SDK.
-     *
-     * @return void
-     */
-    public function createRecurringTransaction(TransactionCreate $sdkTransactionCreate, string $spaceId = ""): Transaction {
-        $settings = $this->settingsService->getSettings();
-        if (empty($spaceId)) {
-            $spaceId = $settings->getSpaceId();
-        }
-
-        $sdkTransaction = $settings->getApiClient()->getTransactionService()->create($spaceId, $sdkTransactionCreate);
-        if ($sdkTransaction->valid()) {
-            return $settings->getApiClient()->getTransactionService()->processWithoutUserInteraction($spaceId, $sdkTransaction->getId());
-        }
-
-        throw new \Exception("The transacion is not valid and could not be created.");
-    }
-
-    /**
-     * @param \Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct $transaction
+     * @param \Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct $transaction
      * @param \Shopware\Core\Framework\Context $context
      * @param int $weareplanetTransactionId
      * @param int $spaceId
      */
     protected function addWeArePlanetTransactionId(
-        PaymentTransactionStruct $transaction,
+        AsyncPaymentTransactionStruct $transaction,
         Context                       $context,
         int                           $weareplanetTransactionId,
         int                           $spaceId
     ): void
     {
         $data = [
-            'id' => $transaction->getOrderTransactionId(),
+            'id' => $transaction->getOrderTransaction()->getId(),
             'customFields' => [
                 TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TRANSACTION_ID => $weareplanetTransactionId,
                 TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_SPACE_ID => $spaceId,
@@ -367,7 +343,7 @@ class TransactionService
      *
      * @return \Shopware\Core\Checkout\Order\OrderEntity
      */
-    protected function getOrderEntity(string $orderId, Context $context): OrderEntity
+    private function getOrderEntity(string $orderId, Context $context): OrderEntity
     {
         try {
             $criteria = (new Criteria([$orderId]))->addAssociations(['deliveries']);
@@ -411,7 +387,7 @@ class TransactionService
      * @throws \WeArePlanet\Sdk\Http\ConnectionException
      * @throws \WeArePlanet\Sdk\VersioningException
      */
-    public function read(int $transactionId, string $salesChannelId = ""): Transaction
+    public function read(int $transactionId, string $salesChannelId): Transaction
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
         return $settings->getApiClient()->getTransactionService()->read($settings->getSpaceId(), $transactionId);
@@ -618,8 +594,7 @@ class TransactionService
                 ->setCustomerEmailAddress($customer->getEmail())
                 ->setCustomerId($customerId)
                 ->setSuccessUrl($homeUrl . '?success')
-                ->setFailedUrl($homeUrl . '?fail')
-                ->setTokenizationMode(TokenizationMode::FORCE_CREATION);
+                ->setFailedUrl($homeUrl . '?fail');
 
             $transactionService = $settings->getApiClient()->getTransactionService();
             $transaction = $transactionService->create($settings->getSpaceId(), $transactionPayload);

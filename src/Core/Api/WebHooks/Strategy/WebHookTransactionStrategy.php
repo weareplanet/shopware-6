@@ -9,13 +9,12 @@ use Shopware\Core\{
 	Checkout\Cart\CartException,
 	Framework\Context,
 	System\StateMachine\Exception\IllegalTransitionException};
-use WeArePlanet\Sdk\Model\{
-	RefundState,
-	Transaction,
-	TransactionInvoiceState,
-	TransactionState,
-	TransactionInvoice,
-    Token};
+use WeArePlanet\Sdk\{
+	Model\RefundState,
+	Model\Transaction,
+	Model\TransactionInvoiceState,
+	Model\TransactionState,
+	Model\TransactionInvoice,};
 use WeArePlanetPayment\Core\{
 	Api\WebHooks\Service\WebHooksService,
 	Api\WebHooks\Struct\WebHookRequest,
@@ -52,7 +51,7 @@ class WebHookTransactionStrategy extends WebHookStrategyBase implements WebhookS
 	 * @throws \WeArePlanet\Sdk\Http\ConnectionException ConnectionException.
 	 * @throws \WeArePlanet\Sdk\VersioningException VersioningException.
 	 */
-	public function getTransaction(WebHookRequest $request): Transaction {
+	public function getTransaction(WebHookRequest $request) {
 		return $this->settings->getApiClient()
 			->getTransactionService()
 			->read($request->getSpaceId(), $request->getEntityId());
@@ -61,7 +60,7 @@ class WebHookTransactionStrategy extends WebHookStrategyBase implements WebhookS
 	/**
 	 * @inheritDoc
 	 */
-	public function getOrderIdByTransaction(Transaction $transaction): string
+	public function getOrderIdByTransaction($transaction): string
 	{
 		/** @var \WeArePlanet\Sdk\Model\Transaction $transaction */
 		return $transaction->getMetaData()[TransactionPayload::WEAREPLANET_METADATA_ORDER_ID];
@@ -97,7 +96,7 @@ class WebHookTransactionStrategy extends WebHookStrategyBase implements WebhookS
 	 */
 	public function process(WebHookRequest $request): Response
 	{
-		return $this->processTransaction($request, $this->getContext());
+		return $this->updateTransaction($request, $this->getContext());
 	}
 
 	/**
@@ -108,17 +107,16 @@ class WebHookTransactionStrategy extends WebHookStrategyBase implements WebhookS
 	 * @param Context $context The operational context providing settings and environment for transaction processing.
 	 * @return Response Returns a JSON response indicating the result of the transaction update operation.
 	 */
-	private function processTransaction(WebHookRequest $request, Context $context): Response
+	private function updateTransaction(WebHookRequest $request, Context $context): Response
 	{
 		$status = Response::HTTP_UNPROCESSABLE_ENTITY;
 
 		try {
 			/** @var \Shopware\Core\Checkout\Order\OrderEntity $order */
 			$transaction = $this->getTransaction($request);
-            $token = $transaction->getToken();
-			$orderId = $transaction->getMetaData()[TransactionPayload::WEAREPLANET_METADATA_ORDER_ID];
-			if (!empty($orderId) && !$transaction->getParent()) {
-				$this->executeLocked($orderId, $context, function () use ($orderId, $transaction, $context, $request, $token) {
+			$orderId     = $transaction->getMetaData()[TransactionPayload::WEAREPLANET_METADATA_ORDER_ID];
+			if(!empty($orderId) && !$transaction->getParent()) {
+				$this->executeLocked($orderId, $context, function () use ($orderId, $transaction, $context, $request) {
 					$this->transactionService->upsert($transaction, $context);
 					$orderTransactionId = $transaction->getMetaData()[TransactionPayload::WEAREPLANET_METADATA_ORDER_TRANSACTION_ID];
 					$orderTransaction   = $this->getOrderTransaction($orderId, $context);
@@ -145,16 +143,6 @@ class WebHookTransactionStrategy extends WebHookStrategyBase implements WebhookS
 								$this->unholdDelivery($orderId, $context);
 								break;
 							case TransactionState::AUTHORIZED:
-                                if ($token instanceof Token) {
-                                    // Update orderTransaction with the authorized token:
-                                    $data = [
-                                        'id' => $orderTransactionId,
-                                        'customFields' => [
-                                            TransactionPayload::ORDER_TRANSACTION_CUSTOM_FIELDS_WEAREPLANET_TOKEN => $token->getId(),
-                                        ],
-                                    ];
-                                    $this->container->get('order_transaction.repository')->update([$data], $context);
-                                }
 								$this->orderTransactionStateHandler->process($orderTransactionId, $context);
 								$this->sendEmail($transaction, $context, $orderId);
 								break;
