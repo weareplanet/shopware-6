@@ -47,7 +47,9 @@ Component.register('weareplanet-order-action-refund-partial', {
         createdComponent() {
             this.isLoading = false;
             this.currency = this.transactionData.transactions[0].currency;
-            this.refundAmount = this.$parent.$parent.itemRefundableAmount;
+            if (!this.refundAmount) {
+                this.refundAmount = this.$parent.$parent.itemRefundableAmount;
+            }
         },
 
 		createPartialRefund(itemUniqueId) {
