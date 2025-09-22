@@ -28,24 +28,24 @@ Please note that this plugin is for versions 6.5, 6.6 or 6.7. For the 6.4 plugin
 Copy
 composer require weareplanet/shopware-6
 php bin/console plugin:refresh
-php bin/console plugin:install --activate --clearCache WeArePlanetPayment
+php bin/console plugin:install --activate --clearCache WeArePlanet
 ```
 
 ### Manual Installation
 
 1. Download the latest [Release](../../releases)
-2. Extract the ZIP to custom/plugins/WeArePlanetPayment.
+2. Extract the ZIP to custom/plugins/WeArePlanet.
 
 ```bash
 Copy
 bin/console plugin:refresh  
-bin/console plugin:install --activate --clearCache WeArePlanetPayment  
+bin/console plugin:install --activate --clearCache WeArePlanet
 ```
 
 ## Configuration
 ### API Credentials
 
-1. Navigate to Shopware Admin > Settings > WeArePlanet Payment.
+1. Navigate to Shopware Admin > Settings > WeArePlanet.
 2. Enter your Space ID, User ID, and API Key (obtained from the [WeArePlanet Portal](https://paymentshub.weareplanet.com/)).
 
 ### Payment Methods
@@ -78,7 +78,7 @@ ________________________________________________________________________________
 
 ```bash
 Copy
-tail -f var/log/weareplanet_payment*.log
+tail -f var/log/weareplanet*.log
 ```
 ### Common Issues:
 
