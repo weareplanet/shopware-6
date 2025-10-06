@@ -1,3 +1,11 @@
+# 7.1.2
+- Support the ability to have different spaces for differet sales channels
+- Fixed issue where Twint would not appear sometimes
+
+# 7.1.1
+- Updated documentation
+- Fixed issue with addresses not being correctly synced
+
 # 7.1.0
 ## Feature
 - Support subscription payment methods
