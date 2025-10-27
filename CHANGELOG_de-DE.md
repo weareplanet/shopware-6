@@ -1,3 +1,7 @@
+# 7.1.3
+– Problem behoben, bei dem die Einstellungen von Optionsfeldern/Schaltern nicht gespeichert wurden.
+– Problem behoben, bei dem nach fehlgeschlagenen Zahlungen sporadisch ein Fehlerbildschirm angezeigt wurde.
+
 # 7.1.2
 - Unterstützung der Möglichkeit, unterschiedliche Bereiche für verschiedene Vertriebskanäle zu nutzen.
 - Problem behoben, bei dem Twint manchmal nicht angezeigt wurde.
