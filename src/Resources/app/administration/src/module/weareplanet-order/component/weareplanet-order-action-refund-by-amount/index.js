@@ -70,14 +70,17 @@ Component.register('weareplanet-order-action-refund-by-amount', {
 				});
 			}).catch((errorResponse) => {
 				try {
-					var errorTitle;
+					var errorTitle = errorResponse?.response?.data?.errors?.[0]?.title ?? this.$tc('weareplanet-order.refundAction.refundCreateError.errorTitle')
 					var errorMessage;
-					if (errorResponse.response.data == 'refundExceedsAmount') {
-						errorTitle = this.$tc('weareplanet-order.refundAction.refundExceedsTotalError.title');
-						errorMessage = this.$tc('weareplanet-order.refundAction.refundExceedsTotalError.messageRefundAmountExceedsAvailableBalance');
-					} else {
-						errorTitle = errorResponse.response.data.errors[0].title;
-						errorMessage = errorResponse.response.data.errors[0].detail;
+					switch(errorResponse.response.data) {
+						case 'refundAmountZero':
+							errorMessage = this.$tc('weareplanet-order.refundAction.refundCreateError.messageRefundAmountIsZero');
+						break;
+						case 'refundExceedsAmount':
+							errorMessage = this.$tc('weareplanet-order.refundAction.refundCreateError.messageRefundAmountExceedsAvailableBalance');
+						break;
+						default:
+							errorMessage = errorResponse.response.data.errors[0].detail;
 					}
 					this.createNotificationError({
 						title: errorTitle,

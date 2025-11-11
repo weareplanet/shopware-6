@@ -1,0 +1,25 @@
+{
+  "base": "/bundles/weareplanetpayment/administration/",
+  "entryPoints": {
+    "we-are-planet-payment": {
+      "css": [
+        "/bundles/weareplanetpayment/administration/assets/we-are-planet-payment-uodnomXx.css"
+      ],
+      "dynamic": [],
+      "js": [
+        "/bundles/weareplanetpayment/administration/assets/we-are-planet-payment-DxquGqtI.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}
