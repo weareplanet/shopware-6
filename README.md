@@ -13,11 +13,10 @@ The WeArePlanet Payment Plugin integrates modern payment processing into Shopwar
 - **WeArePlanet Account:** Obtain `Space ID`, `User ID`, and `API Key` from the [WeArePlanet Dashboard](https://paymentshub.weareplanet.com/).
 
 ## Documentation
-
-- For English documentation click [here](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.1.17/docs/en/documentation.html)
-- Für die deutsche Dokumentation klicken Sie [hier](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.1.17/docs/de/documentation.html)
-- Pour la documentation Française, cliquez [ici](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.1.17/docs/fr/documentation.html)
-- Per la documentazione in tedesco, clicca [qui](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.1.17/docs/it/documentation.html)
+- For English documentation click [here](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/en/documentation.html)
+- Für die deutsche Dokumentation klicken Sie [hier](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/de/documentation.html)
+- Pour la documentation Française, cliquez [ici](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/fr/documentation.html)
+- Per la documentazione in tedesco, clicca [qui](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/it/documentation.html)
 
 ## Installation
 
@@ -41,6 +40,22 @@ php bin/console plugin:install --activate --clearCache WeArePlanetPayment
 Copy
 bin/console plugin:refresh  
 bin/console plugin:install --activate --clearCache WeArePlanetPayment  
+```
+
+## Update
+
+### Via Administration
+1. Go to Shopware Admin > Extensions > My extensions.
+2. Find WeArePlanetPayment.
+3. Click Update.
+
+### Via CLI
+1. Deploy the new plugin files (replace the folder in custom/plugins/WeArePlanetPayment or upload/install a new ZIP).
+2. Run:
+```bash
+bin/console plugin:refresh
+bin/console plugin:update --clearCache WeArePlanetPayment
+bin/console cache:clear
 ```
 
 ## Configuration

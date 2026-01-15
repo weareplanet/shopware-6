@@ -32,7 +32,7 @@ use WeArePlanetPayment\Core\Api\Refund\Entity\RefundEntityDefinition;
  */
 class TransactionEntityDefinition extends EntityDefinition {
 
-	public const ENTITY_NAME = 'weareplanet_transaction';
+	public const ENTITY_NAME = 'weareplanet_transaction_data';
 
 	/**
 	 * @return string
