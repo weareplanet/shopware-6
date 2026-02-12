@@ -13,10 +13,10 @@ The WeArePlanet Payment Plugin integrates modern payment processing into Shopwar
 - **WeArePlanet Account:** Obtain `Space ID`, `User ID`, and `API Key` from the [WeArePlanet Dashboard](https://paymentshub.weareplanet.com/).
 
 ## Documentation
-- For English documentation click [here](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/en/documentation.html)
-- Für die deutsche Dokumentation klicken Sie [hier](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/de/documentation.html)
-- Pour la documentation Française, cliquez [ici](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/fr/documentation.html)
-- Per la documentazione in tedesco, clicca [qui](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.0/docs/it/documentation.html)
+- For English documentation click [here](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.1/docs/en/documentation.html)
+- Für die deutsche Dokumentation klicken Sie [hier](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.1/docs/de/documentation.html)
+- Pour la documentation Française, cliquez [ici](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.1/docs/fr/documentation.html)
+- Per la documentazione in tedesco, clicca [qui](https://plugin-documentation.weareplanet.com/weareplanet/shopware-6/6.2.1/docs/it/documentation.html)
 
 ## Installation
 
