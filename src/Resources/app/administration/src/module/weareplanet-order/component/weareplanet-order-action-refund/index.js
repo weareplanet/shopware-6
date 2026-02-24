@@ -77,6 +77,9 @@ Component.register('weareplanet-order-action-refund', {
 						case 'refundExceedsQuantity':
 							errorMessage = this.$tc('weareplanet-order.refundAction.refundCreateError.messageRefundQuantityExceedsAvailableBalance');
 						break;
+						case 'methodDoesNotSupportRefund':
+							errorMessage = this.$tc('weareplanet-order.refundAction.refundCreateError.messagePaymentMethodDoesNotSupportRefund');
+						break;
 						default:
 							errorMessage = errorResponse.response.data.errors[0].detail;
 					}
