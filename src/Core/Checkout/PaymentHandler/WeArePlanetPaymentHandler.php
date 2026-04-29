@@ -137,7 +137,7 @@ class WeArePlanetPaymentHandler extends AbstractPaymentHandler
             }
 
             $contextToken = $this->getContextToken($request);
-            $parameters = new SalesChannelContextServiceParameters($salesChannelContextId, $contextToken, originalContext: $context);
+            $parameters = new SalesChannelContextServiceParameters($salesChannelContextId, $contextToken, languageId: $context->getLanguageId(), originalContext: $context);
 
             $salesChannelContext = $this->salesChannelContextService->get($parameters);
             $redirectUrl = $transaction->getReturnUrl();
