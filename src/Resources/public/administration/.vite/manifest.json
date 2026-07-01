@@ -1,0 +1,11 @@
+{
+  "main.js": {
+    "file": "js/we-are-planet-payment.js",
+    "name": "we-are-planet-payment",
+    "src": "main.js",
+    "isEntry": true,
+    "css": [
+      "css/we-are-planet-payment.css"
+    ]
+  }
+}
