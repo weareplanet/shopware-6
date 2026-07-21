@@ -3,11 +3,11 @@
   "entryPoints": {
     "we-are-planet-payment": {
       "css": [
-        "/bundles/weareplanetpayment/administration/assets/we-are-planet-payment-uodnomXx.css"
+        "/bundles/weareplanetpayment/administration/css/we-are-planet-payment.css"
       ],
       "dynamic": [],
       "js": [
-        "/bundles/weareplanetpayment/administration/assets/we-are-planet-payment-BHkxKEB5.js"
+        "/bundles/weareplanetpayment/administration/js/we-are-planet-payment.js"
       ],
       "legacy": false,
       "preload": []
@@ -16,10 +16,10 @@
   "legacy": false,
   "metadatas": {},
   "version": [
-    "7.1.0",
+    "7.0.4",
     7,
-    1,
-    0
+    0,
+    4
   ],
   "viteServer": null
 }
