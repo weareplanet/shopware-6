@@ -291,23 +291,49 @@ Component.register('weareplanet-order-detail', {
 			});
 		},
 		downloadPackingSlip() {
-			window.open(
+			this.saveDocument(
 				this.WeArePlanetTransactionService.getPackingSlip(
 					this.transaction.metaData.salesChannelId,
 					this.transaction.id
-				),
-				'_blank'
+				)
 			);
 		},
 
 		downloadInvoice() {
-			window.open(
+			this.saveDocument(
 				this.WeArePlanetTransactionService.getInvoiceDocument(
 					this.transaction.metaData.salesChannelId,
 					this.transaction.id
-				),
-				'_blank'
+				)
 			);
+		},
+
+		/**
+		 * Save a document that was fetched through an authenticated request.
+		 *
+		 * The endpoints require the admin API token, so the document arrives as a blob
+		 * instead of being opened by the browser directly.
+		 *
+		 * @param {Promise<{blob: Blob, filename: String}>} documentPromise
+		 */
+		saveDocument(documentPromise) {
+			documentPromise.then(({blob, filename}) => {
+				const objectUrl = window.URL.createObjectURL(blob);
+				const link = document.createElement('a');
+
+				link.href = objectUrl;
+				link.download = filename;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				window.URL.revokeObjectURL(objectUrl);
+			}).catch((errorResponse) => {
+				this.createNotificationError({
+					title: this.$tc('weareplanet-order.paymentDetails.error.title'),
+					message: errorResponse.message,
+					autoClose: false
+				});
+			});
 		},
 
 		resetDataAttributes() {
