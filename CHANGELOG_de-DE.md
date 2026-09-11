@@ -1,3 +1,28 @@
+## Sicherheitsupdate (v 5.0.17)
+- Diese Version behebt eine Sicherheitslücke, die frühere Versionen des Integrations-Plugins betraf.
+Allen Händlern wird dringend empfohlen, sofort auf Version 5.0.17 zu aktualisieren, um die Sicherheit ihrer Integration zu gewährleisten.
+
+### Änderungen
+- Sicherheit: Ein Problem wurde behoben, das unter bestimmten Konfigurationen unbefugten Zugriff auf bestimmte Daten ermöglichen konnte.
+
+### Erforderliche Maßnahmen
+- Laden Sie dieses Update so bald wie möglich herunter und installieren Sie es. Nach dem Upgrade sind keine Konfigurationsänderungen erforderlich.
+Für eine vollständige Installationsanleitung oder bei Fragen wenden Sie sich bitte an unsere Dokumentation oder an unser Integrationsteam.
+
+# 5.0.16
+- Integrieren Sie Headless-Unterstützung
+
+# 5.0.15
+- Fix für doppelte Zahlungsmethoden in der Datenbank
+- Fix für SDK Herunterladen
+
+# 5.0.14
+- Fix für doppelte Zahlungsmethoden in der Datenbank
+
+# 5.0.13
+- Schlüsselsignatur implementiert
+- Steuersatzanpassung, wenn Produkte unterschiedliche Steuersätze haben
+
 # 5.0.12
 - Meldung behoben, dass Liefer- und Rechnungsadresse immer identisch waren
 

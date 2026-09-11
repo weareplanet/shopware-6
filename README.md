@@ -44,7 +44,7 @@ Uncompress the zip file you download, and include the autoloader in your project
 
 ```bash
 # unzip to ShopwareInstallDir/custom/plugins/WeArePlanetPayment
-composer require weareplanet/sdk 4.4.0
+composer require weareplanet/sdk 4.9.1
 php bin/console plugin:refresh
 php bin/console plugin:install --activate --clearCache WeArePlanetPayment
 ```
